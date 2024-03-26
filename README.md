@@ -53,6 +53,14 @@ export PYTHONPATH=/path/to/pysot:$PYTHONPATH
 ### Download models
 Download models in [PySOT Model Zoo](MODEL_ZOO.md) and put the model.pth in the correct directory in experiments
 
+### Hailo demo
+```bash
+python tools/demo_hailo.py \
+    --config experiments/siamrpn_mobilev2_l234_dwxcorr/config.yaml
+    --snapshot hailo_files/rpn_mobilenetv2_sim.hef
+    --video demo/bag.avi
+```
+
 ### Webcam demo
 ```bash
 python tools/demo.py \
