@@ -1,0 +1,15 @@
+1)use onnx simplifier:
+
+onnxsim input_onnx_model output_onnx_model
+
+2) use hailo parser:
+
+hailo parser onnx MODEL_NAME.onnx
+
+3) quantize:
+
+python quantize.py
+
+4) compile:
+
+python compile.py
