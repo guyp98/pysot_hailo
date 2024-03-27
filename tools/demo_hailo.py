@@ -94,7 +94,7 @@ def main():
                               (bbox[0]+bbox[2], bbox[1]+bbox[3]),
                               (0, 255, 0), 3)
             cv2.imshow(video_name, frame)
-            cv2.waitKey(40)
+            cv2.waitKey(1)
 
 
 if __name__ == '__main__':
