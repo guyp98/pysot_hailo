@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 import numpy as np
 import torch.nn.functional as F
 from torch import from_numpy
+import queue
 
 from pysot.core.config import cfg
 from pysot.utils.anchor import Anchors
@@ -38,6 +39,10 @@ class SiamRPNTracker(SiameseTracker):
                                                         format_type=FormatType.UINT8)
         self.output_vstreams_params = OutputVStreamParams.make(self.network_group, quantized=False,
                                                           format_type=FormatType.FLOAT32)
+        self.queue = queue.Queue()
+        self.infer = self.hailo_infer()
+        #activate hailo
+        next(self.infer)
 
 
     def generate_anchor(self, score_size):
@@ -103,6 +108,12 @@ class SiamRPNTracker(SiameseTracker):
                                     cfg.TRACK.EXEMPLAR_SIZE,
                                     s_z, self.channel_average)
         
+    def hailo_infer(self):
+        with InferVStreams(self.network_group, self.input_vstreams_params, self.output_vstreams_params) as infer_pipeline:
+            with self.network_group.activate(self.network_group_params):
+                yield None
+                while not self.queue.empty():
+                    yield infer_pipeline.infer(self.queue.get())
 
     def track(self, img):
         """
@@ -122,11 +133,9 @@ class SiamRPNTracker(SiameseTracker):
 
         m_input_data_for_hef = {self.hef.get_input_vstream_infos()[0].name: self.z_crop,
                                 self.hef.get_input_vstream_infos()[1].name: x_crop}
-        
-        
-        with InferVStreams(self.network_group, self.input_vstreams_params, self.output_vstreams_params) as infer_pipeline:
-            with self.network_group.activate(self.network_group_params):
-                hef_outputs = infer_pipeline.infer(m_input_data_for_hef)
+        #infer hailo
+        self.queue.put(m_input_data_for_hef)
+        hef_outputs = next(self.infer)
 
         outputs = {'cls':from_numpy(hef_outputs[self.hef.get_output_vstream_infos()[0].name].transpose(0, 3, 1, 2)),
                    'loc':from_numpy(hef_outputs[self.hef.get_output_vstream_infos()[1].name].transpose(0, 3, 1, 2))}
@@ -183,3 +192,10 @@ class SiamRPNTracker(SiameseTracker):
                 'bbox': bbox,
                 'best_score': best_score
                }
+
+    def close(self):
+        try:
+            while True:
+                next(self.infer)
+        except StopIteration:
+            pass

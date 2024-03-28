@@ -95,6 +95,7 @@ def main():
                               (0, 255, 0), 3)
             cv2.imshow(video_name, frame)
             cv2.waitKey(1)
+    tracker.close()
 
 
 if __name__ == '__main__':
