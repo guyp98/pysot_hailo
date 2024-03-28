@@ -41,9 +41,6 @@ class SiamRPNTracker(SiameseTracker):
                                                           format_type=FormatType.FLOAT32)
         self.queue = queue.Queue()
         self.infer = self.hailo_infer()
-        #activate hailo
-        next(self.infer)
-
 
     def generate_anchor(self, score_size):
         anchors = Anchors(cfg.ANCHOR.STRIDE,
@@ -111,7 +108,6 @@ class SiamRPNTracker(SiameseTracker):
     def hailo_infer(self):
         with InferVStreams(self.network_group, self.input_vstreams_params, self.output_vstreams_params) as infer_pipeline:
             with self.network_group.activate(self.network_group_params):
-                yield None
                 while not self.queue.empty():
                     yield infer_pipeline.infer(self.queue.get())
 
