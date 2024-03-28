@@ -1,3 +1,5 @@
 model_optimization_config(calibration, batch_size=1, calibset_size=64)\n
 post_quantization_optimization(bias_correction, policy=enabled)
 post_quantization_optimization(bias_correction, policy=disabled)
+resources_param(max_control_utilization=0.95, max_compute_utilization=0.8, max_memory_utilization=0.8)
+context_switch_param(max_utilization=0.35)
