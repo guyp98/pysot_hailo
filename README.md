@@ -42,7 +42,7 @@ We provide a large set of baseline results and trained models available for down
 ## Installation
 
 * Please find installation instructions for PyTorch and PySOT in [`INSTALL.md`](INSTALL.md).
-* To support hailo8 model please go to [`Hailo website`](https://hailo.ai/) install hailo driver and hailo python package. 
+* To support hailo8 model please go to [`Hailo website`](https://hailo.ai/) install hailo driver and hailo python package. (was tested for hailort 4.16) 
 
 ## Quick Start: Using PySOT
 
